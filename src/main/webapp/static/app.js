@@ -349,6 +349,31 @@ function initPageState() {
   })();
 }
 
+(async function(){
+    const charge_level = 0.90;
+    function setTheme(bool){
+        document.documentElement.classList.toggle('bw', bool);
+    }
+    function decide(battery){
+        if(!battery.charging && battery.level <= charge_level){
+            setTheme(true);
+        }
+        else{
+            setTheme(false);
+        }
+    }
+    if(!('getBattery' in navigator)){
+        return;
+    }
+
+    try{
+        const battery = await navigator.getBattery();
+        decide(battery);
+        battery.addEventListener('levelchange', () => decide(battery));
+        battery.addEventListener('chargingchange', () => decide(battery));
+    } catch{}
+})();
+
 
 document.addEventListener('DOMContentLoaded', initPageState);
 
